@@ -8,9 +8,9 @@ export class MeasureController {
   constructor(private readonly measureService: MeasureService) {}
 
   @Post('measure')
-  measure(@Body() measureParam: MeasureParam) {
+  async measure(@Body() measureParam: MeasureParam) {
     try {
-      const res = this.measureService.measure(measureParam);
+      const res = await this.measureService.measure(measureParam);
       return HttpResponse.ok(res);
     } catch (error) {
       return HttpResponse.err(error.msg);

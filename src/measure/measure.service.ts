@@ -11,8 +11,8 @@ const _ = require('lodash');
 export class MeasureService {
   constructor(private readonly configService: ConfigService) {}
 
-  measure(measureParam: MeasureParam) {
-    const res = _measure(
+  async measure(measureParam: MeasureParam) {
+    const res = await _measure(
       measureParam.imagePath,
       measureParam.imageSize,
       measureParam.modelPath,
@@ -44,32 +44,37 @@ function _measure(
   detectRegionPath: string,
   measureThreshold: number,
 ) {
-  const pointer = ref.alloc('pointer');
-  const retVal = rectifyDll.calculateChipsCoorV2(
-    1,
-    imagePath,
-    imageSize.height,
-    imageSize.width,
-    imageSize.channel,
-    modelPath,
-    (pos as Array<number>).doubleToBuffer(),
-    (mappingParams as Array<number>).doubleToBuffer(),
-    (lensParams as Array<number>).doubleToBuffer(),
-    (rectifyParams as Array<number>).doubleToBuffer(),
-    roiCornerPoint.doubleToBuffer(),
-    chipNum,
-    chipSize.doubleToBuffer(),
-    0,
-    detectRegionPath,
-    measureThreshold,
-    pointer,
-  );
-  if (retVal !== 0) throw new Error(`测量异常(返回值: ${retVal})`);
-  const SIZE_OF_DOUBLE = 8;
-  const countBuf = pointer.readPointer(0, SIZE_OF_DOUBLE);
-  const count = countBuf.readDoubleLE(0);
-  const dataBuf = pointer.readPointer(0, (count + 1) * SIZE_OF_DOUBLE);
-  const res = Array.from(new Float64Array(dataBuf.buffer, 8, count));
-  rectifyDll.releaseArray(pointer);
-  return _.chunk(res, 6);
+  return new Promise((resolve, reject) => {
+    const pointer = ref.alloc('pointer');
+    rectifyDll.calculateChipsCoorV2.async(
+      1,
+      imagePath,
+      imageSize.height,
+      imageSize.width,
+      imageSize.channel,
+      modelPath,
+      (pos as Array<number>).doubleToBuffer(),
+      (mappingParams as Array<number>).doubleToBuffer(),
+      (lensParams as Array<number>).doubleToBuffer(),
+      (rectifyParams as Array<number>).doubleToBuffer(),
+      roiCornerPoint.doubleToBuffer(),
+      chipNum,
+      chipSize.doubleToBuffer(),
+      0,
+      detectRegionPath,
+      measureThreshold,
+      pointer,
+      (err, retVal) => {
+        if (err) throw new Error(err.msg);
+        if (retVal !== 0) throw new Error(`测量异常(返回值: ${retVal})`);
+        const SIZE_OF_DOUBLE = 8;
+        const countBuf = pointer.readPointer(0, SIZE_OF_DOUBLE);
+        const count = countBuf.readDoubleLE(0);
+        const dataBuf = pointer.readPointer(0, (count + 1) * SIZE_OF_DOUBLE);
+        const res = Array.from(new Float64Array(dataBuf.buffer, 8, count));
+        rectifyDll.releaseArray(pointer);
+        resolve(_.chunk(res, 6));
+      },
+    );
+  });
 }
