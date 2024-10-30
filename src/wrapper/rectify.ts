@@ -31,6 +31,8 @@ export const rectify = () => {
       ],
     ],
 
+    releaseArray: ['void', ['double **']],
+
     readDetectRegionInfo: [
       'int',
       ['uchar*', 'int', 'int', 'int', 'int*', 'double**'],

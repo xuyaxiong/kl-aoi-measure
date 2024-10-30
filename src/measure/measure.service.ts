@@ -5,12 +5,13 @@ import rectifyDll from '../wrapper/rectify';
 const ref = require('ref-napi') as typeof import('ref-napi');
 import '../extension';
 import { ImageSize } from './measure.bo';
+const _ = require('lodash');
 
 @Injectable()
 export class MeasureService {
   constructor(private readonly configService: ConfigService) {}
 
-  measure(measureParam: MeasureParam): number[] {
+  measure(measureParam: MeasureParam) {
     const res = _measure(
       measureParam.imagePath,
       measureParam.imageSize,
@@ -44,7 +45,7 @@ function _measure(
   measureThreshold: number,
 ) {
   const pointer = ref.alloc('pointer');
-  rectifyDll.calculateChipsCoorV2(
+  const retVal = rectifyDll.calculateChipsCoorV2(
     1,
     imagePath,
     imageSize.height,
@@ -63,11 +64,12 @@ function _measure(
     measureThreshold,
     pointer,
   );
+  if (retVal !== 0) throw new Error(`测量异常(返回值: ${retVal})`);
   const SIZE_OF_DOUBLE = 8;
   const countBuf = pointer.readPointer(0, SIZE_OF_DOUBLE);
   const count = countBuf.readDoubleLE(0);
-  console.log('count =', count);
   const dataBuf = pointer.readPointer(0, (count + 1) * SIZE_OF_DOUBLE);
   const res = Array.from(new Float64Array(dataBuf.buffer, 8, count));
-  return res;
+  rectifyDll.releaseArray(pointer);
+  return _.chunk(res, 6);
 }
