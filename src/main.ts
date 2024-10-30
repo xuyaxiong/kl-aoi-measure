@@ -4,15 +4,27 @@ import * as fs from 'fs';
 import { spawn } from 'child_process';
 import { join } from 'path';
 import { LoggingInterceptor } from './interceptor/logging.interceptor';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalInterceptors(new LoggingInterceptor());
-  await app.listen(process.env.PORT ?? 3000);
-
+  swaggerDoc(app);
   dllDump(process.pid);
+  await app.listen(process.env.PORT ?? 3000);
 }
+
 bootstrap();
+
+function swaggerDoc(app) {
+  const config = new DocumentBuilder()
+    .setTitle('AOI MEASURE')
+    .setDescription('AOI MEASURE')
+    .setVersion('1.0')
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, documentFactory);
+}
 
 function dllDump(port: number) {
   const crashDir = 'D:\\kl-storage\\crashDump\\';
