@@ -13,6 +13,7 @@ export class MeasureService {
 
   async measure(measureParam: MeasureParam) {
     const res = await _measure(
+      measureParam.fno,
       measureParam.imagePath,
       measureParam.imageSize,
       measureParam.modelPath,
@@ -31,6 +32,7 @@ export class MeasureService {
 }
 
 function _measure(
+  fno: number,
   imagePath: string,
   imageSize: ImageSize,
   modelPath: string,
@@ -73,7 +75,13 @@ function _measure(
         const dataBuf = pointer.readPointer(0, (count + 1) * SIZE_OF_DOUBLE);
         const res = Array.from(new Float64Array(dataBuf.buffer, 8, count));
         rectifyDll.releaseArray(pointer);
-        resolve(_.chunk(res, 6));
+        // 添加出图帧号
+        const tmp = _.chunk(res, 6);
+        tmp.map((item: number[]) => {
+          item.unshift(fno);
+          return item;
+        });
+        resolve(tmp);
       },
     );
   });

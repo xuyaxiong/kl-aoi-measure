@@ -1,6 +1,7 @@
 import { ImageSize } from './measure.bo';
 
 export interface MeasureParam {
+  fno: number;
   imagePath: string;
   imageSize: ImageSize;
   pos: Pos;
