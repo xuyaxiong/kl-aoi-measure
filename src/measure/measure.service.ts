@@ -24,7 +24,7 @@ export class MeasureService {
       measureParam.roiCornerPoint,
       measureParam.chipNum,
       measureParam.chipSize,
-      measureParam.detectRegionPath,
+      measureParam.detectRegionSize,
       measureParam.measureThreshold,
     );
     return res;
@@ -43,7 +43,7 @@ function _measure(
   roiCornerPoint: number[],
   chipNum: number,
   chipSize: number[],
-  detectRegionPath: string,
+  detectRegionSize: number[],
   measureThreshold: number,
 ) {
   return new Promise((resolve, reject) => {
@@ -63,7 +63,7 @@ function _measure(
       chipNum,
       chipSize.doubleToBuffer(),
       0,
-      detectRegionPath,
+      detectRegionSize.doubleToBuffer(),
       measureThreshold,
       pointer,
       (err, retVal) => {
