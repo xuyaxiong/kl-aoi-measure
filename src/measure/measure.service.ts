@@ -17,6 +17,7 @@ export class MeasureService {
       measureParam.imagePath,
       measureParam.imageSize,
       measureParam.modelPath,
+      measureParam.padModelPath,
       measureParam.pos,
       measureParam.mappingParams,
       measureParam.lensParams,
@@ -36,6 +37,7 @@ function _measure(
   imagePath: string,
   imageSize: ImageSize,
   modelPath: string,
+  padModelPath: string,
   pos: Pos,
   mappingParams: MappingParams,
   lensParams: LensParams,
@@ -48,13 +50,14 @@ function _measure(
 ) {
   return new Promise((resolve, reject) => {
     const pointer = ref.alloc('pointer');
-    rectifyDll.calculateChipsCoorV2.async(
+    rectifyDll.calculateChipsCoorV3.async(
       1,
       imagePath,
       imageSize.height,
       imageSize.width,
       imageSize.channel,
       modelPath,
+      padModelPath,
       (pos as Array<number>).doubleToBuffer(),
       (mappingParams as Array<number>).doubleToBuffer(),
       (lensParams as Array<number>).doubleToBuffer(),

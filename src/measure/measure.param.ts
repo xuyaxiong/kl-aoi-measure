@@ -9,6 +9,7 @@ export interface MeasureParam {
   mappingParams: MappingParams;
   rectifyParams: RectifyParams;
   modelPath: string;
+  padModelPath: string;
   chipNum: number;
   chipSize: number[];
   roiCornerPoint: any;

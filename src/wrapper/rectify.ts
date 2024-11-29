@@ -9,7 +9,7 @@ export const rectify = () => {
   process.env.PATH = pathArray.join(';');
 
   const Library = new FFI.Library(path.join(DLL_PATH, 'rectify.dll'), {
-    calculateChipsCoorV2: [
+    calculateChipsCoorV3: [
       'int',
       [
         'int',
@@ -17,6 +17,7 @@ export const rectify = () => {
         'int',
         'int',
         'int',
+        'string',
         'string',
         'double*',
         'double*',
