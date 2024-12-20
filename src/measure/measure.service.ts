@@ -4,7 +4,7 @@ import { MeasureParam } from './measure.param';
 import rectifyDll from '../wrapper/rectify';
 const ref = require('ref-napi') as typeof import('ref-napi');
 import '../extension';
-import { ImageSize } from './measure.bo';
+import { ImageSize, ShieldInfo } from './measure.bo';
 const _ = require('lodash');
 
 @Injectable()
@@ -25,7 +25,7 @@ export class MeasureService {
       measureParam.roiCornerPoint,
       measureParam.chipNum,
       measureParam.chipSize,
-      measureParam.detectRegionSize,
+      measureParam.shieldInfo,
       measureParam.measureThreshold,
     );
     return res;
@@ -45,7 +45,7 @@ function _measure(
   roiCornerPoint: number[],
   chipNum: number,
   chipSize: number[],
-  detectRegionSize: number[],
+  shieldInfo: ShieldInfo,
   measureThreshold: number,
 ) {
   return new Promise((resolve, reject) => {
@@ -66,7 +66,7 @@ function _measure(
       chipNum,
       chipSize.doubleToBuffer(),
       0,
-      detectRegionSize.doubleToBuffer(),
+      shieldInfo.path,
       measureThreshold,
       pointer,
       (err, retVal) => {

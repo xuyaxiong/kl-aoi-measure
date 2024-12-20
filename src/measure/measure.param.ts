@@ -1,4 +1,4 @@
-import { ImageSize } from './measure.bo';
+import { ImageSize, ShieldInfo } from './measure.bo';
 
 export interface MeasureParam {
   fno: number;
@@ -13,7 +13,7 @@ export interface MeasureParam {
   chipNum: number;
   chipSize: number[];
   roiCornerPoint: any;
-  detectRegionSize: number[]; // [maxRow, maxCol]
+  shieldInfo: ShieldInfo;
   measureThreshold: number;
   postProcess: Boolean;
 }
